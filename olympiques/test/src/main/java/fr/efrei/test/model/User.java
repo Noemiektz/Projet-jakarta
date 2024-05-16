@@ -1,6 +1,6 @@
-package com.example.jeuxolympiques.model;
+package fr.efrei.test.model;
 
-import com.example.jeuxolympiques.constants.Role;
+import fr.efrei.test.constants.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
