@@ -1,9 +1,10 @@
 package fr.efrei.test.controller;
 
-import fr.efrei.test.dto.CreateStudent;
-import fr.efrei.test.dto.UpdateStudent;
+import fr.efrei.test.dto.CreateEvent;
+import fr.efrei.test.dto.UpdateEvent;
+import fr.efrei.test.model.Event;
 import fr.efrei.test.model.Student;
-import fr.efrei.test.service.StudentService;
+import fr.efrei.test.service.event;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,26 +17,26 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/students")
+@RequestMapping("events")
 @EnableMethodSecurity
-public class StudentController {
+public class EventController {
 
-	private final StudentService service;
+	private final EventService service;
 
 	@Autowired
-	public StudentController(StudentService service) {
-		this.service = service;
+	public EventController(EventService service) {
+		this.event = service;
 	}
 
 	@GetMapping
 	public ResponseEntity<List<Student>> findAll() {
-		return new ResponseEntity<>(service.findAllStudents(), HttpStatus.OK);
+		return new ResponseEntity<>(event.findAllevents(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{uuid}")
-	public ResponseEntity<Student> findOneById(@PathVariable String uuid) {
-		Student student = service.findStudentById(uuid);
-		if(student != null) {
+	public ResponseEntity<Event> findOneById(@PathVariable String uuid) {
+		Event event = service.findStudentById(uuid);
+		if(event != null) {
 			return new ResponseEntity<>(service.findStudentById(uuid), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -43,9 +44,9 @@ public class StudentController {
 
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping
-	public ResponseEntity<Student> save(@Valid @RequestBody CreateStudent student) {
-		Student createdStudent = service.create(student);
-		return new ResponseEntity<>(createdStudent, HttpStatus.CREATED);
+	public ResponseEntity<Event> save(@Valid @RequestBody CreateEvent event) {
+		Student createdEvent = service.create(Event);
+		return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("/{uuid}")
@@ -60,8 +61,8 @@ public class StudentController {
 	@PutMapping("/{uuid}")
 	public ResponseEntity<?> mettreAJourTotalement(
 			@PathVariable String uuid,
-			@RequestBody UpdateStudent student) {
-		boolean isUpdated = service.update(uuid, student);
+			@RequestBody UpdateEvent event) {
+		boolean isUpdated = service.update(uuid, event);
 		if(isUpdated) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
@@ -71,7 +72,7 @@ public class StudentController {
 	@PatchMapping("/{uuid}")
 	public ResponseEntity<?> mettreAjourPartiellement(
 			@PathVariable String uuid,
-			@RequestBody UpdateStudent student) {
+			@RequestBody UpdateEvent student) {
 		boolean isUpdated = service.updatePartielle(uuid, student);
 		if(isUpdated) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);

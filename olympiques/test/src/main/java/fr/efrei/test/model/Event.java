@@ -22,19 +22,13 @@ public class Event {
 		return name;
 	}
 
-	public Set<Student> getEvents() {
-		return students;
+	public Set<Event> getEvents() {
+		return events;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setEvent(Set<Event> events) {
-		this.events = events;
-	}
 
-	public String getUuid() {
-		return uuid;
-	}
 }

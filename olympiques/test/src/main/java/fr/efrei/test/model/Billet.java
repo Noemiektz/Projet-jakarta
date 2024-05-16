@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 public class Billet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private Integer id;
+	private String uuid;
 
 	public Billet() {}
 	public Billet(int id) {
@@ -19,7 +19,7 @@ public class Billet {
 		return id;
 	}
 
-	public void setId(Int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
