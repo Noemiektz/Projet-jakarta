@@ -11,75 +11,63 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
-
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-public class User implements UserDetails {
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(nullable = false)
-	private String id;
+@Table(name = "User")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false)
-	private String fullName;
+    @Column(nullable = false, unique = true)
+    private String username;
 
-	@Column(unique = true, length = 100, nullable = false)
-	private String email;
+    @Column(nullable = false)
+    private String password;
 
-	@Column(nullable = false)
-	private String password;
+    @Column(nullable = false)
+    private String role;
 
-	@CreationTimestamp
-	@Column(updatable = false, name = "created_at")
-	private Date createdAt;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Billet> billets = new HashSet<>();
 
-	@UpdateTimestamp
-	@Column(name = "updated_at")
-	private Date updatedAt;
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-	@Enumerated(EnumType.STRING)
-	private Role role;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Set<Role> roles = Set.of(role);
-		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+    public String getUsername() {
+        return username;
+    }
 
-		for (Role role : roles) {
-			authorities.add(new SimpleGrantedAuthority(role.name()));
-		}
-		return authorities;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	@Override
-	public String getUsername() {
-		return email;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+    public String getRole() {
+        return role;
+    }
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+    public Set<Billet> getBillets() {
+        return billets;
+    }
 
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
+    public void setBillets(Set<Billet> billets) {
+        this.billets = billets;
+    }
 }

@@ -1,72 +1,77 @@
 package fr.efrei.test.service;
 
+import fr.efrei.test.UserRepository;
+import fr.efrei.test.dto.BilletDto;
 import fr.efrei.test.dto.CreateBillet;
 import fr.efrei.test.dto.CreateEvent;
 import fr.efrei.test.dto.UpdateBillet;
 import fr.efrei.test.dto.UpdateEvent;
 import fr.efrei.test.model.Billet;
 import fr.efrei.test.model.Event;
+import fr.efrei.test.model.User;
 import fr.efrei.test.repository.BilletRepository;
+import fr.efrei.test.repository.EventRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BilletService {
+    @Autowired
+    private BilletRepository billetRepository;
 
-	private final BilletRepository repository;
+    @Autowired
+    private EventRepository eventRepository;
 
-	@Autowired
-	public BilletService(BilletRepository repository) {
-		this.repository = repository;
-	}
+    @Autowired
+    private UserRepository userRepository;
 
-	public List<Event> findAllEvents() {
-		return repository.findAllByDeletedAtNull();
-	}
+    public BilletDto buyBillet(Long eventId, Long userId) {
+        // Find event and user by their IDs
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-	public Event findStudentById(String uuid) {
-		return repository.findOneByUuid(uuid).orElse(null);
-	}
+        // Ensure the user is not already registered for another event on the same date
+        List<Billet> userBillets = billetRepository.findByUserId(userId);
+        for (Billet billet : userBillets) {
+            if (billet.getEvent().getDate().toLocalDate().equals(event.getDate().toLocalDate())) {
+                throw new IllegalStateException("User already registered for another event on the same date");
+            }
+        }
 
-	public Event create(CreateEvent event) {
-		// ici je suis dans la DTO
-		//
-		Event eventACreer = new Event(
-				event.getName(),
-				
-		);
-		// je suis dans une entité
-		return repository.save(eventACreer);
-	}
+        // Create and save the new billet
+        Billet billet = new Billet();
+        billet.setEvent(event);
+        billet.setUser(user);
+        billet = billetRepository.save(billet);
 
+        // Convert to BilletDTO and return
+        BilletDto billetDTO = new BilletDto();
+        billetDTO.setId(billet.getId());
+        billetDTO.setEventId(billet.getEvent().getId());
+        billetDTO.setUserId(billet.getUser().getId());
 
+        return billetDTO;
+    }
 
-	public boolean update(String uuid, UpdateEvent student) {
-		Event eventAModifier = findEventById(uuid);
+      public List<BilletDto> getUserBillets(Long userId) {
+        List<Billet> billets = billetRepository.findByUserId(userId);
+        return billets.stream().map(billet -> {
+            BilletDto billetDTO = new BilletDto();
+            billetDTO.setId(billet.getId());
+            billetDTO.setEventId(billet.getEvent().getId());
+            billetDTO.setUserId(billet.getUser().getId());
+            return billetDTO;
+        }).collect(Collectors.toList());
+    }
 
-		if(eventAModifier != null) {
-			eventAModifier.setName(eventAModifier.getName());
-			repository.save(Billet eventAModifier);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean updatePartielle(String uuid, UpdateEvent event) {
-		Event eventAModifier = findEventById(uuid);
-
-		if(eventAModifier != null) {
-		
-			if(!event.getName().isEmpty()) {
-				eventAModifier.setName(event.getName());
-			}
-			repository.save(Billet eventAModifier);
-			return true;
-		}
-		return false;
-	}
+    public void deleteBillet(Long billetId) {
+        billetRepository.deleteById(billetId);
+    }
 }

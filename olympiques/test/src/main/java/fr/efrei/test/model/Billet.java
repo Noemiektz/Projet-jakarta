@@ -6,26 +6,36 @@ import jakarta.persistence.*;
 public class Billet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-	private String uuid;
+    private Long id;
 
-	public Billet() {}
-	public Billet(int id) {
-		this.id = id;
-		
-	}
+    @ManyToOne
+    private Event event;
 
-	public int getId() {
-		return id;
-	}
+    @ManyToOne
+    private User user;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
+    public Event getEvent() {
+        return event;
+    }
 
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
