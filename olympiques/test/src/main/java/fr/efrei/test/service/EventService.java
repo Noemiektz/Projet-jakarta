@@ -3,17 +3,30 @@ package fr.efrei.test.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.efrei.test.dto.EventDto;
+import fr.efrei.test.model.Event;
 import fr.efrei.test.repository.EventRepository;
 
+@Service
 public class EventService {
-    @Service
-public class eventService {
-
     @Autowired
     private EventRepository eventRepository;
 
-    public void registerUserForEvent(Long eventId, Long userId) {
-        // Vérifier si l'utilisateur est déjà inscrit à un événement à la même date, sinon, enregistrer l'utilisateur pour l'événement
+    @Autowired
+    private StadiumRepository stadiumRepository;
+
+    public EventDto createEvent(EventDto eventDTO) {
+        Event event = new Event();
+        event.setName(eventDTO.getName());
+        event.setDate(eventDTO.getDate());
+
+        Stadium stadium = stadiumRepository.findById(eventDTO.getStadiumId())
+                .orElseThrow(() -> new ResourceNotFoundException("Stadium not found"));
+        event.setStadium(stadium);
+
+        event = eventRepository.save(event);
+
+        eventDTO.setId(event.getId());
+        return eventDTO;
     }
-}
 }
